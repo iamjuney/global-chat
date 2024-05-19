@@ -4,10 +4,13 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { getReadableDateNow } from '$lib/utils';
-	import { BadgeAlert, LogOut, Reply, Send } from 'lucide-svelte';
+	import type { SubmitFunction } from '@sveltejs/kit';
+	import { BadgeAlert, LogOut, Reply, Send, Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
+	let isSending = $state(false);
+	let message = $state('');
 
 	$effect(() => {
 		if (data.user) {
@@ -16,11 +19,29 @@
 			});
 		}
 	});
+
+	const handleSubmit: SubmitFunction = () => {
+		isSending = true;
+
+		return ({ result }) => {
+			// if the result is a failure, set the failedSearchData to the result data
+			// else, set the interviews to the result data
+			if (result.type === 'failure') {
+				message = '';
+				toast.error(`${result.data?.message}`, {
+					description: 'Error sending message. Please try again.'
+				});
+			}
+			// else if (result.type === 'success') interviews = result.data?.interviews;
+
+			isSending = false;
+		};
+	};
 </script>
 
 <div class="flex h-screen w-full items-center justify-center bg-gray-100">
 	<div
-		class="h-[70vh] w-full max-w-[576px] rounded-lg border border-gray-200 bg-white p-4 shadow-md"
+		class="h-full w-full max-w-[576px] rounded-lg border border-gray-200 bg-white p-4 shadow-md md:h-[70vh]"
 	>
 		<div class="flex h-full flex-col justify-end gap-4">
 			<div class="flex flex-col gap-2">
@@ -122,24 +143,7 @@
 						<div class="flex-1 space-y-1">
 							<div class="rounded-lg bg-gray-100 p-3">
 								<p>
-									I'm excited too! This is a great way to connect with people from all over the
-									world.
-								</p>
-							</div>
-							<div class="flex items-center gap-2 text-xs text-gray-500">
-								<span>@shadcn</span>
-								<span>9:17 AM</span>
-								<Button size="icon" variant="ghost">
-									<Reply class="h-5 w-5" />
-								</Button>
-							</div>
-						</div>
-					</div>
-					<div class="flex items-start gap-3">
-						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-gray-100 p-3">
-								<p>
-									I'm excited too! This is a great way to connect with people from all over the
+									send I'm excited too! This is a great way to connect with people from all over the
 									world.
 								</p>
 							</div>
@@ -154,12 +158,23 @@
 					</div>
 				</div>
 			</div>
-			<div class="flex items-center gap-2">
-				<Input placeholder="Type a message..." class="flex-1" />
-				<Button size="icon" variant="ghost">
-					<Send class="size-6" />
+			<form
+				method="POST"
+				action="?/send"
+				class="flex items-center gap-2"
+				use:enhance={handleSubmit}
+			>
+				<Input name="message" bind:value={message} placeholder="Type a message..." class="flex-1" />
+				<Button type="submit" size="icon" variant="ghost" disabled={isSending}>
+					{#if isSending}
+						<span class="animate-spin">
+							<Loader2 class="size-6" />
+						</span>
+					{:else}
+						<Send class="size-6" />
+					{/if}
 				</Button>
-			</div>
+			</form>
 		</div>
 	</div>
 </div>
