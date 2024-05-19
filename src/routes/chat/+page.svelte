@@ -5,9 +5,9 @@
 	import { BadgeAlert, LogOut } from 'lucide-svelte';
 </script>
 
-<div class="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-950">
+<div class="flex h-screen w-full items-center justify-center bg-gray-100">
 	<div
-		class="h-[70vh] w-full max-w-[576px] rounded-lg border border-gray-200 bg-white p-4 shadow-md dark:border-gray-800 dark:bg-gray-900"
+		class="h-[70vh] w-full max-w-[576px] rounded-lg border border-gray-200 bg-white p-4 shadow-md"
 	>
 		<div class="flex h-full flex-col justify-end gap-4">
 			<div class="flex flex-col gap-2">
@@ -21,7 +21,7 @@
 							<Tooltip.Content class="max-w-40">
 								<div class="flex flex-col gap-2">
 									<h3 class="text-sm font-semibold">Note:</h3>
-									<p class="text-xs text-gray-500 dark:text-gray-400">
+									<p class="text-xs text-gray-500">
 										Please be respectful to others and keep the conversation friendly.
 									</p>
 								</div>
@@ -29,7 +29,7 @@
 						</Tooltip.Root>
 					</div>
 					<div class="flex items-center gap-3">
-						<p class="text-sm text-gray-500 dark:text-gray-400">@mkdir_jun</p>
+						<p class="text-sm text-gray-500">@mkdir_jun</p>
 
 						<form method="post" use:enhance action="?/logout">
 							<Button size="icon" variant="ghost">
@@ -48,13 +48,13 @@
 				<div class="flex flex-col justify-end gap-4">
 					<div class="flex items-start gap-3">
 						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
+							<div class="rounded-lg bg-gray-100 p-3">
 								<p>
 									Hey everyone! Just wanted to say hi and let you know I'm excited to be part of
 									this global chat app.
 								</p>
 							</div>
-							<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+							<div class="flex items-center gap-2 text-xs text-gray-500">
 								<span>@shadcn</span>
 								<span>9:15 AM</span>
 								<button
@@ -87,9 +87,7 @@
 									any questions.
 								</p>
 							</div>
-							<div
-								class="flex items-center justify-end gap-2 text-xs text-gray-500 dark:text-gray-400"
-							>
+							<div class="flex items-center justify-end gap-2 text-xs text-gray-500">
 								<span>@jaredpalmer</span>
 								<span>9:16 AM</span>
 								<button
@@ -116,13 +114,13 @@
 					</div>
 					<div class="flex items-start gap-3">
 						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
+							<div class="rounded-lg bg-gray-100 p-3">
 								<p>
 									I'm excited too! This is a great way to connect with people from all over the
 									world.
 								</p>
 							</div>
-							<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+							<div class="flex items-center gap-2 text-xs text-gray-500">
 								<span>@shadcn</span>
 								<span>9:17 AM</span>
 								<button
@@ -149,13 +147,13 @@
 					</div>
 					<div class="flex items-start gap-3">
 						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
+							<div class="rounded-lg bg-gray-100 p-3">
 								<p>
 									I'm excited too! This is a great way to connect with people from all over the
 									world.
 								</p>
 							</div>
-							<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+							<div class="flex items-center gap-2 text-xs text-gray-500">
 								<span>@shadcn</span>
 								<span>9:17 AM</span>
 								<button
@@ -182,13 +180,13 @@
 					</div>
 					<div class="flex items-start gap-3">
 						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
+							<div class="rounded-lg bg-gray-100 p-3">
 								<p>
 									I'm excited too! This is a great way to connect with people from all over the
 									world.
 								</p>
 							</div>
-							<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+							<div class="flex items-center gap-2 text-xs text-gray-500">
 								<span>@shadcn</span>
 								<span>9:17 AM</span>
 								<button

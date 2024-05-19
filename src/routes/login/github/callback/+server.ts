@@ -34,8 +34,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			.limit(1);
 
 		if (existingUser && existingUser.length > 0) {
-			console.log('existingUser', existingUser);
-			const session = await lucia.createSession(existingUser[0].id, {});
+			const session = await lucia.createSession(existingUser[0].id, existingUser[0].username, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
@@ -51,7 +50,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				username: githubUser.login
 			});
 
-			const session = await lucia.createSession(userId, {});
+			const session = await lucia.createSession(userId, githubUser.login, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			event.cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
@@ -65,6 +64,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			}
 		});
 	} catch (e) {
+		console.error(e);
 		// the specific error message depends on the provider
 		if (e instanceof OAuth2RequestError) {
 			// invalid code
