@@ -39,6 +39,7 @@
   "dependencies": {
     "@lucia-auth/adapter-drizzle": "^1.0.7",
     "@types/node": "^20.12.12",
+    "@types/nprogress": "^0.2.3",
     "@types/pg": "^8.11.6",
     "arctic": "^1.8.1",
     "bits-ui": "^0.21.8",
@@ -48,8 +49,10 @@
     "formsnap": "^1.0.0",
     "lucide-svelte": "^0.378.0",
     "mode-watcher": "^0.3.0",
+    "nprogress": "^0.2.0",
     "pg": "^8.11.5",
     "postgres": "^3.4.4",
+    "runed": "^0.6.0",
     "svelte-sonner": "^0.3.24",
     "sveltekit-superforms": "^2.13.1",
     "tailwind-merge": "^2.3.0",

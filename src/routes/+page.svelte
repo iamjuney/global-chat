@@ -1,6 +1,18 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import { getReadableDateNow } from '$lib/utils';
 	import { Github } from 'lucide-svelte';
+	import { toast } from 'svelte-sonner';
+
+	let { form } = $props();
+
+	$effect(() => {
+		if (form?.logout) {
+			toast.success('Successfully logout.', {
+				description: getReadableDateNow()
+			});
+		}
+	});
 </script>
 
 <div class="flex h-screen items-center justify-center bg-gray-100">
