@@ -32,7 +32,7 @@
 						<p class="text-sm text-gray-500">@mkdir_jun</p>
 
 						<form method="post" use:enhance action="?/logout">
-							<Button size="icon" variant="ghost">
+							<Button type="submit" size="icon" variant="ghost">
 								<LogOut class="h-5 w-5" />
 							</Button>
 						</form>
