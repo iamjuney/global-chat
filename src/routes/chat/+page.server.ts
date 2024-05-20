@@ -13,7 +13,7 @@ export const load: PageServerLoad = async (event) => {
 		redirect(302, '/');
 	}
 
-	const messages = await db.select().from(TB_chats).orderBy(desc(TB_chats.createdAt)).limit(25);
+	const messages = await db.select().from(TB_chats).orderBy(desc(TB_chats.createdAt)).limit(10);
 
 	return {
 		user: event.locals.user,
@@ -75,7 +75,5 @@ export const actions: Actions = {
 		} catch (error) {
 			return fail(500, { message: 'Failed to insert message' });
 		}
-
-		redirect(303, '/chat');
 	}
 };

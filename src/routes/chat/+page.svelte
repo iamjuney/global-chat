@@ -62,6 +62,9 @@
 					toast.success('Message sent successfully!', {
 						description: getReadableDateNow()
 					});
+					if (chatWindow) {
+						chatWindow.scrollTop = chatWindow.scrollHeight;
+					}
 				}
 			)
 			.subscribe();
@@ -73,7 +76,6 @@
 
 	// Scroll to the bottom of the chatWindow
 	$effect(() => {
-		messages;
 		showReplyAlert;
 
 		if (chatWindow) {
@@ -95,6 +97,39 @@
 
 			isSending = false;
 		};
+	};
+
+	// Load more messages
+	const loadMoreMessages = async () => {
+		let clientHeight = chatWindow?.scrollTop;
+
+		if (clientHeight !== 0) return;
+
+		isLoadingMore = true;
+
+		const { data: newMessages, error } = await supabase
+			.from('chats')
+			.select('*')
+			.order('created_at', { ascending: false })
+			.range(messages.length, messages.length + 5);
+
+		if (error) {
+			toast.error('Error loading more messages. Please try again.', {
+				description: error.message
+			});
+		}
+
+		if (newMessages?.length === 0) {
+			isLoadingMore = false;
+			return;
+		}
+
+		if (newMessages) {
+			messages = [...messages, ...newMessages];
+			chatWindow?.scrollTo(0, clientHeight + 250);
+		}
+
+		isLoadingMore = false;
 	};
 </script>
 
@@ -215,11 +250,12 @@
 			</div>
 
 			<div
+				bind:this={chatWindow}
+				onscroll={loadMoreMessages}
 				class={cn(
 					'-mr-2 flex-1 overflow-y-auto pr-2',
 					isLoadingMore && 'relative overflow-y-hidden'
 				)}
-				bind:this={chatWindow}
 			>
 				{#if isLoadingMore}
 					<div
