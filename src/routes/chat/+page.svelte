@@ -5,6 +5,7 @@
 	import { cn, getReadableDateNow } from '$lib/utils';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { BadgeAlert, Loader2, LogOut, Reply, Send, X } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Time from 'svelte-time';
 
@@ -37,6 +38,29 @@
 
 	// Listen for new messages
 	$effect(() => {
+		const handleNewMessage = (payload: any) => {
+			const newMessage = {
+				username: payload.new.username,
+				message: payload.new.message,
+				repliedToUsername: payload.new.replied_to_username,
+				repliedToMessage: payload.new.replied_to_message,
+				createdAt: payload.new.created_at
+			};
+
+			messages = [newMessage, ...messages];
+			message = '';
+
+			if (data.user.username === payload.new.username) {
+				toast.success('Message sent successfully!', {
+					description: getReadableDateNow()
+				});
+
+				if (showReplyAlert) {
+					showReplyAlert = false;
+				}
+			}
+		};
+
 		const channel = supabase
 			.channel('realtime chats')
 			.on(
@@ -46,31 +70,7 @@
 					schema: 'public',
 					table: 'chats'
 				},
-				(payload) => {
-					// Create new message object
-					const newMessage: Message = {
-						username: payload.new.username,
-						message: payload.new.message,
-						repliedToUsername: payload.new.replied_to_username,
-						repliedToMessage: payload.new.replied_to_message,
-						createdAt: payload.new.created_at
-					};
-
-					// Add new message to messages array
-					messages = [newMessage, ...messages];
-					message = '';
-
-					// TODO: Fix this, this is not working
-					if (data.user.username === payload.new.username) {
-						toast.success('Message sent successfully!', {
-							description: getReadableDateNow()
-						});
-					}
-
-					if (chatWindow) {
-						chatWindow.scrollTop = chatWindow.scrollHeight;
-					}
-				}
+				handleNewMessage
 			)
 			.subscribe();
 
@@ -81,11 +81,16 @@
 
 	// Scroll to the bottom of the chatWindow
 	$effect(() => {
+		messages;
 		showReplyAlert;
 
-		if (chatWindow) {
+		if (chatWindow && chatWindow.clientHeight <= chatWindow.scrollTop + 130) {
 			chatWindow.scrollTop = chatWindow.scrollHeight;
 		}
+	});
+
+	onMount(() => {
+		chatWindow?.scrollTo(0, chatWindow.scrollHeight);
 	});
 
 	// Handles form submission
@@ -115,7 +120,7 @@
 		const { data: newMessages, error } = await supabase
 			.from('chats')
 			.select('*')
-			.order('created_at', { ascending: false })
+			.order('id', { ascending: false })
 			.range(messages.length, messages.length + 5);
 
 		if (error) {
