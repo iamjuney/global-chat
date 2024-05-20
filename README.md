@@ -1,6 +1,6 @@
 # 📨Chatteee
 
-Chatteee is a global chat app that allows users to chat with each other in real-time. Users can log in using Github OAuth, and chat with other users. The app is built using **[Sveltekit](https://kit.svelte.dev/)**, **[Supabase](https://supabase.com/)**, **[Shadcn](https://www.shadcn-svelte.com/)**, **[DrizzleORM](https://orm.drizzle.team/)**, and **[Lucia Auth](https://lucia-auth.com/)**.
+Chatteee is a global chat app that allows users to chat with each other in real-time. Users can log in using Github OAuth, and chat with other users. The app is built using **[Sveltekit](https://kit.svelte.dev/)**, **[Supabase](https://supabase.com/)**, **[Shadcn](https://www.shadcn-svelte.com/)**, **[DrizzleORM](https://orm.drizzle.team/)**, **[Lucia Auth](https://lucia-auth.com/)** and **[ProfanityAPI](https://www.profanity.dev/)** by **[joschan21](https://github.com/joschan21/profanity.dev)**.
 
 ## Installation
 
