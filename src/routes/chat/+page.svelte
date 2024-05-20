@@ -59,7 +59,7 @@
 					// Add new message to messages array
 					messages = [newMessage, ...messages];
 					message = '';
-					if (data.user.id === payload.new.user_id) {
+					if (data.user.id === payload.new.id) {
 						toast.success('Message sent successfully!', {
 							description: getReadableDateNow()
 						});
