@@ -10,3 +10,10 @@ Chatteee is a global chat app that allows users to chat with each other in real-
 3. Copy the `.env.example` file to `.env` and fill in the required environment variables
 4. Run the app
    `pnpm dev`
+
+## Setup Supabase
+
+1. Create a new project on [Supabase](https://supabase.com/)
+2. Push the schema using the following command
+   `pnpm run db:push`
+3. Go to your supabase project /database/publications and turn on the `realtime` option for the `chats` table
