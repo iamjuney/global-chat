@@ -3,10 +3,6 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { generateState } from 'arctic';
 
-export const config = {
-	runtime: 'edge'
-};
-
 export async function GET(event: RequestEvent): Promise<Response> {
 	const state = generateState();
 	const url = await github.createAuthorizationURL(state);

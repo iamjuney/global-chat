@@ -6,10 +6,6 @@ import { OAuth2RequestError } from 'arctic';
 import { eq } from 'drizzle-orm';
 import { generateIdFromEntropySize } from 'lucia';
 
-export const config = {
-	runtime: 'edge'
-};
-
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get('code');
 	const state = event.url.searchParams.get('state');

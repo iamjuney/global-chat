@@ -7,10 +7,6 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 import type { Actions, PageServerLoad } from './$types';
 
-export const config = {
-	runtime: 'edge'
-};
-
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
 		redirect(302, '/');
