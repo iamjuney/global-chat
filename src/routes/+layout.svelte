@@ -1,6 +1,6 @@
 <script>
 	import { navigating } from '$app/stores';
-	import { Toaster } from '$lib/components/ui/sonner';
+	import { Toaster } from '$lib/components';
 	import NProgress from 'nprogress';
 	import 'nprogress/nprogress.css';
 	import '../app.css';

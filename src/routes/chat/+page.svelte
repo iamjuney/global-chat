@@ -1,10 +1,6 @@
 <script lang="ts">
-	// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 	import { enhance } from '$app/forms';
-	import * as Alert from '$lib/components/ui/alert';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { Alert, Button, Input, Tooltip } from '$lib/components';
 	import { supabase } from '$lib/supabase/client';
 	import { getReadableDateNow, getReadableTime } from '$lib/utils';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -27,6 +23,7 @@
 	let repliedToMessage = $state('');
 	let showReplyAlert = $state(false);
 
+	// Show welcome message
 	$effect(() => {
 		if (data.user) {
 			toast.success(`Welcome @${data.user.username}!`, {
@@ -35,6 +32,7 @@
 		}
 	});
 
+	// Listen for new messages
 	$effect(() => {
 		const channel = supabase
 			.channel('realtime chats')
@@ -64,12 +62,11 @@
 		};
 	});
 
+	// Handles form submission
 	const handleSubmit: SubmitFunction = () => {
 		isSending = true;
 
 		return ({ result }) => {
-			// if the result is a failure, set the failedSearchData to the result data
-			// else, set the interviews to the result data
 			if (result.type === 'failure') {
 				message = '';
 				toast.error(`${result.data?.message}`, {
@@ -127,6 +124,7 @@
 					class="h-[1px] w-full shrink-0 bg-secondary"
 				></div>
 			</div>
+
 			<div class="-mr-2 flex-1 overflow-y-auto pr-2">
 				<div class="flex flex-col justify-end gap-4">
 					{#each messages as message}
