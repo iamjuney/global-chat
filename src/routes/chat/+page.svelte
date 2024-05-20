@@ -74,6 +74,7 @@
 	// Scroll to the bottom of the chatWindow
 	$effect(() => {
 		messages;
+		showReplyAlert;
 
 		if (chatWindow) {
 			chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -96,6 +97,82 @@
 		};
 	};
 </script>
+
+{#snippet messageBubble(message: Message)}
+	<div
+		class={cn('flex items-start gap-3', message.username === data.user.username && 'justify-end')}
+	>
+		<div
+			class={cn(
+				'flex flex-col space-y-1',
+				message.username === data.user.username ? 'items-end justify-end' : 'justify-start'
+			)}
+		>
+			<div
+				class={cn(
+					'text-pretty rounded-lg p-3',
+					message.username === data.user.username
+						? 'w-fit max-w-64 bg-primary text-primary-foreground '
+						: 'w-fit max-w-64 bg-secondary text-foreground'
+				)}
+			>
+				{#if message.repliedToUsername}
+					<div>
+						<p class="text-xs text-muted-foreground">
+							Replied to
+							<u
+								class={cn(
+									message.username === data.user.username
+										? 'text-primary-foreground'
+										: 'text-foreground'
+								)}
+								>@{message.repliedToUsername}
+							</u>
+							- {message.repliedToMessage}
+						</p>
+					</div>
+				{/if}
+				<p>
+					{message.message}
+				</p>
+			</div>
+			<div
+				class={cn(
+					'flex items-center gap-2 text-xs text-muted-foreground',
+					message.username === data.user.username && 'justify-end'
+				)}
+			>
+				{#if message.username === data.user.username}
+					<Button
+						size="icon"
+						variant="ghost"
+						on:click={() => {
+							repliedToUsername = message.username;
+							repliedToMessage = message.message;
+							showReplyAlert = true;
+						}}
+					>
+						<Reply class="h-5 w-5" />
+					</Button>
+					<span>You · <Time relative timestamp={message.createdAt} /></span>
+				{:else}
+					<span>@{message.username} · <Time relative timestamp={message.createdAt} /></span>
+					<Button
+						size="icon"
+						variant="ghost"
+						on:click={() => {
+							repliedToUsername = message.username;
+							repliedToMessage = message.message;
+							showReplyAlert = true;
+						}}
+					>
+						<Reply class="h-5 w-5" />
+					</Button>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/snippet}
 
 <div class="flex h-screen w-full items-center justify-center bg-secondary">
 	<div
@@ -155,66 +232,7 @@
 				{/if}
 				<div class="flex flex-col justify-end gap-4">
 					{#each messages.toReversed() as message}
-						<div
-							class={cn(
-								'flex items-start gap-3',
-								message.username === data.user.username && 'justify-end'
-							)}
-						>
-							<div class="flex-1 space-y-1">
-								<div
-									class={cn(
-										'rounded-lg  p-3 text-primary-foreground',
-										message.username === data.user.username ? 'bg-primary' : 'bg-secondary'
-									)}
-								>
-									{#if message.repliedToUsername}
-										<div>
-											<p class="text-xs text-muted-foreground">
-												Replied to
-												<u
-													class={cn(
-														message.username === data.user.username
-															? 'text-primary-foreground'
-															: 'text-foreground'
-													)}
-													>@{message.repliedToUsername}
-												</u>
-												- {message.repliedToMessage}
-											</p>
-										</div>
-									{/if}
-									<p>
-										{message.message}
-									</p>
-								</div>
-								<div
-									class={cn(
-										'flex items-center gap-2 text-xs text-muted-foreground',
-										message.username === data.user.username && 'justify-end'
-									)}
-								>
-									{#if message.username === data.user.username}
-										<span>You · <Time relative timestamp={message.createdAt} /></span>
-									{:else}
-										<span
-											>@{message.username} · <Time relative timestamp={message.createdAt} /></span
-										>
-									{/if}
-									<Button
-										size="icon"
-										variant="ghost"
-										on:click={() => {
-											repliedToUsername = message.username;
-											repliedToMessage = message.message;
-											showReplyAlert = true;
-										}}
-									>
-										<Reply class="h-5 w-5" />
-									</Button>
-								</div>
-							</div>
-						</div>
+						{@render messageBubble(message)}
 					{/each}
 				</div>
 			</div>
