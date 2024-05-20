@@ -7,7 +7,6 @@
 
 <Sonner
 	theme={$mode}
-	richColors
 	class="toaster group"
 	toastOptions={{
 		classes: {
