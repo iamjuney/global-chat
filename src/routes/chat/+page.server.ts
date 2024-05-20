@@ -1,3 +1,4 @@
+import { PROFANITY_FILTER } from '$env/static/private';
 import { db } from '$lib/supabase/db';
 import { TB_chats } from '$lib/supabase/schema';
 import { fail, redirect } from '@sveltejs/kit';
@@ -40,21 +41,23 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid search query' });
 		}
 
-		// Check for profanity
-		const response = await fetch('https://vector.profanity.dev', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ message: form.data.message })
-		});
+		if (PROFANITY_FILTER) {
+			// Check for profanity
+			const response = await fetch('https://vector.profanity.dev', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ message: form.data.message })
+			});
 
-		if (!response.ok) {
-			return fail(500, { message: 'Profanity check failed' });
-		}
+			if (!response.ok) {
+				return fail(500, { message: 'Profanity check failed' });
+			}
 
-		const { isProfanity } = await response.json();
+			const { isProfanity } = await response.json();
 
-		if (isProfanity) {
-			return fail(400, { message: 'Profanity detected' });
+			if (isProfanity) {
+				return fail(400, { message: 'Profanity detected' });
+			}
 		}
 
 		// Create the new message object
