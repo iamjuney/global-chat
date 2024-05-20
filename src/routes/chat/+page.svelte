@@ -4,12 +4,13 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { getReadableDateNow } from '$lib/utils';
+	import { getReadableDateNow, getReadableTime } from '$lib/utils';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { BadgeAlert, Loader2, LogOut, Reply, Send, X } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
+	let messages = $derived(data.messages);
 	let isSending = $state(false);
 	let message = $state('');
 	let repliedToUsername = $state('');
@@ -35,8 +36,13 @@
 				toast.error(`${result.data?.message}`, {
 					description: 'Error sending message. Please try again.'
 				});
+			} else if (result.type === 'success') {
+				message = '';
+				showReplyAlert = false;
+				toast.success('Message sent successfully!', {
+					description: getReadableDateNow()
+				});
 			}
-			// else if (result.type === 'success') interviews = result.data?.interviews;
 
 			isSending = false;
 		};
@@ -84,74 +90,77 @@
 			</div>
 			<div class="-mr-2 flex-1 overflow-y-auto pr-2">
 				<div class="flex flex-col justify-end gap-4">
-					<div class="flex items-start gap-3">
-						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-secondary p-3">
-								<p>
-									Hey everyone! Just wanted to say hi and let you know I'm excited to be part of
-									this global chat app.
-								</p>
-							</div>
-							<div class="flex items-center gap-2 text-xs text-muted-foreground">
-								<span>@shadcn</span>
-								<span>9:15 AM</span>
-								<Button
-									size="icon"
-									variant="ghost"
-									on:click={() => {
-										repliedToUsername = 'shadcn';
-										repliedToMessage =
-											"Hey everyone! Just wanted to say hi and let you know I'm excited to be part of this global chat app.";
-										showReplyAlert = true;
-									}}
-								>
-									<Reply class="h-5 w-5" />
-								</Button>
-							</div>
-						</div>
-					</div>
-					<div class="flex items-start justify-end gap-3">
-						<div class="flex-1 space-y-1">
-							<div class="rounded-lg bg-primary p-3 text-primary-foreground">
-								<p>
-									Awesome, I'm looking forward to chatting with everyone! Let me know if you have
-									any questions.
-								</p>
-							</div>
-							<div class="flex items-center justify-end gap-2 text-xs text-muted-foreground">
-								<span>@jaredpalmer</span>
-								<span>9:16 AM</span>
-								<Button size="icon" variant="ghost">
-									<Reply class="h-5 w-5" />
-								</Button>
-							</div>
-						</div>
-					</div>
-					<div class="flex items-start gap-3">
-						<div class="flex-1 space-y-1">
-							<div class="flex flex-col gap-3 rounded-lg bg-secondary p-3">
-								<div>
-									<p class="text-xs text-muted-foreground">
-										Replied to <u class="text-foreground">@shadcn</u>
-										- Awesome, I'm looking forward to chatting with everyone! Let me know if you have
-										any questions.
-									</p>
+					{#each messages as message}
+						{#if message.username === data.user.username}
+							<div class="flex items-start justify-end gap-3">
+								<div class="flex-1 space-y-1">
+									<div class="rounded-lg bg-primary p-3 text-primary-foreground">
+										{#if message.repliedToUsername}
+											<div>
+												<p class="text-xs text-muted-foreground">
+													Replied to <u class="text-primary-foreground"
+														>@{message.repliedToUsername}</u
+													>
+													- {message.repliedToMessage}
+												</p>
+											</div>
+										{/if}
+										<p>
+											{message.message}
+										</p>
+									</div>
+									<div class="flex items-center justify-end gap-2 text-xs text-muted-foreground">
+										<span>You</span>
+										<span>{getReadableTime(message.createdAt)}</span>
+										<Button
+											size="icon"
+											variant="ghost"
+											on:click={() => {
+												repliedToUsername = message.username;
+												repliedToMessage = message.message;
+												showReplyAlert = true;
+											}}
+										>
+											<Reply class="h-5 w-5" />
+										</Button>
+									</div>
 								</div>
-								<p>
-									I'm excited too! This is a great way to connect with people from all over the
-									world.
-								</p>
 							</div>
-							<div class="flex items-center gap-2 text-xs text-muted-foreground">
-								<span>@shadcn</span>
-								<span>9:17 AM</span>
-
-								<Button size="icon" variant="ghost">
-									<Reply class="h-5 w-5" />
-								</Button>
+						{:else}
+							<div class="flex items-start gap-3">
+								<div class="flex-1 space-y-1">
+									<div class="rounded-lg bg-secondary p-3">
+										{#if message.repliedToUsername}
+											<div>
+												<p class="text-xs text-muted-foreground">
+													Replied to <u class="text-foreground">@{message.repliedToUsername}</u>
+													- {message.repliedToMessage}
+												</p>
+											</div>
+										{/if}
+										<p>
+											{message.message}
+										</p>
+									</div>
+									<div class="flex items-center gap-2 text-xs text-muted-foreground">
+										<span>@{message.username}</span>
+										<span>{getReadableTime(message.createdAt)}</span>
+										<Button
+											size="icon"
+											variant="ghost"
+											on:click={() => {
+												repliedToUsername = message.username;
+												repliedToMessage = message.message;
+												showReplyAlert = true;
+											}}
+										>
+											<Reply class="h-5 w-5" />
+										</Button>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
+						{/if}
+					{/each}
 				</div>
 			</div>
 

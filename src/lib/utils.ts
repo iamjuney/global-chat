@@ -67,3 +67,12 @@ export const getReadableDateNow = () => {
 	});
 	return dateNow;
 };
+
+export const getReadableTime = (date: Date) => {
+	const time = date.toLocaleString('en-US', {
+		hour: 'numeric',
+		minute: 'numeric',
+		hour12: true
+	});
+	return time;
+};

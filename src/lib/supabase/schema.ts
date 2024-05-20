@@ -18,13 +18,9 @@ export const TB_users = pgTable('users', {
 export const TB_chats = pgTable('chats', {
 	id: serial('id').primaryKey(),
 	message: text('message').default('').notNull(),
-	userId: varchar('user_id', {
-		length: 255
-	})
-		.notNull()
-		.references(() => TB_users.id),
-	repliedToUsername: varchar('replied_to_username'),
-	repliedToMessage: text('replied_to_message'),
+	username: varchar('username').notNull(),
+	repliedToUsername: varchar('replied_to_username').default('').notNull(),
+	repliedToMessage: text('replied_to_message').default('').notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
