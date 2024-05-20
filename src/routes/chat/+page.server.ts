@@ -1,7 +1,7 @@
 import { db } from '$lib/supabase/db';
 import { TB_chats } from '$lib/supabase/schema';
 import { fail, redirect } from '@sveltejs/kit';
-import { asc } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async (event) => {
 		redirect(302, '/');
 	}
 
-	const messages = await db.select().from(TB_chats).orderBy(asc(TB_chats.createdAt)).limit(25);
+	const messages = await db.select().from(TB_chats).orderBy(desc(TB_chats.createdAt)).limit(25);
 
 	return {
 		user: event.locals.user,
@@ -62,7 +62,8 @@ export const actions: Actions = {
 			username: locals.user.username,
 			message: form.data.message,
 			repliedToUsername: form.data.replied_to_username ?? '',
-			repliedToMessage: form.data.replied_to_message ?? ''
+			repliedToMessage: form.data.replied_to_message ?? '',
+			createdAt: new Date().toString()
 		};
 
 		try {
@@ -71,5 +72,7 @@ export const actions: Actions = {
 		} catch (error) {
 			return fail(500, { message: 'Failed to insert message' });
 		}
+
+		redirect(303, '/chat');
 	}
 };

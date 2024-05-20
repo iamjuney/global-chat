@@ -1,4 +1,5 @@
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
+import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import pg from 'pg';
@@ -12,7 +13,9 @@ export const TB_users = pgTable('users', {
 	}).primaryKey(),
 	github_id: integer('github_id').unique().notNull(),
 	username: varchar('username').unique().notNull(),
-	createdAt: timestamp('created_at').defaultNow().notNull()
+	createdAt: timestamp('created_at', { mode: 'string' })
+		.notNull()
+		.default(sql`now()`)
 });
 
 export const TB_chats = pgTable('chats', {
@@ -21,7 +24,7 @@ export const TB_chats = pgTable('chats', {
 	username: varchar('username').notNull(),
 	repliedToUsername: varchar('replied_to_username').default('').notNull(),
 	repliedToMessage: text('replied_to_message').default('').notNull(),
-	createdAt: timestamp('created_at').defaultNow().notNull()
+	createdAt: varchar('created_at').notNull()
 });
 
 export const TB_sessions = pgTable('sessions', {

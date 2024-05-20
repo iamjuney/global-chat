@@ -2,26 +2,29 @@
 	import { enhance } from '$app/forms';
 	import { Alert, Button, Input, Tooltip } from '$lib/components';
 	import { supabase } from '$lib/supabase/client';
-	import { getReadableDateNow, getReadableTime } from '$lib/utils';
+	import { cn, getReadableDateNow } from '$lib/utils';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { BadgeAlert, Loader2, LogOut, Reply, Send, X } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+	import Time from 'svelte-time';
 
 	type Message = {
 		username: string;
 		message: string;
 		repliedToUsername: string;
 		repliedToMessage: string;
-		createdAt: Date;
+		createdAt: string;
 	};
 
 	let { data } = $props();
 	let messages = $state<Message[]>(data.messages);
 	let isSending = $state(false);
+	let isLoadingMore = $state(false);
 	let message = $state('');
 	let repliedToUsername = $state('');
 	let repliedToMessage = $state('');
 	let showReplyAlert = $state(false);
+	let chatWindow = $state<HTMLElement | null>(null);
 
 	// Show welcome message
 	$effect(() => {
@@ -44,7 +47,8 @@
 					table: 'chats'
 				},
 				(payload) => {
-					const newMessage = {
+					// Create new message object
+					const newMessage: Message = {
 						username: payload.new.username,
 						message: payload.new.message,
 						repliedToUsername: payload.new.replied_to_username,
@@ -52,7 +56,12 @@
 						createdAt: payload.new.created_at
 					};
 
-					messages.push(newMessage);
+					// Add new message to messages array
+					messages = [newMessage, ...messages];
+					message = '';
+					toast.success('Message sent successfully!', {
+						description: getReadableDateNow()
+					});
 				}
 			)
 			.subscribe();
@@ -60,6 +69,15 @@
 		return () => {
 			supabase.removeChannel(channel);
 		};
+	});
+
+	// Scroll to the bottom of the chatWindow
+	$effect(() => {
+		messages;
+
+		if (chatWindow) {
+			chatWindow.scrollTop = chatWindow.scrollHeight;
+		}
 	});
 
 	// Handles form submission
@@ -71,12 +89,6 @@
 				message = '';
 				toast.error(`${result.data?.message}`, {
 					description: 'Error sending message. Please try again.'
-				});
-			} else if (result.type === 'success') {
-				message = '';
-				showReplyAlert = false;
-				toast.success('Message sent successfully!', {
-					description: getReadableDateNow()
 				});
 			}
 
@@ -125,78 +137,84 @@
 				></div>
 			</div>
 
-			<div class="-mr-2 flex-1 overflow-y-auto pr-2">
+			<div
+				class={cn(
+					'-mr-2 flex-1 overflow-y-auto pr-2',
+					isLoadingMore && 'relative overflow-y-hidden'
+				)}
+				bind:this={chatWindow}
+			>
+				{#if isLoadingMore}
+					<div
+						class="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-background bg-opacity-90"
+					>
+						<span class="animate-spin">
+							<Loader2 class="size-10" />
+						</span>
+					</div>
+				{/if}
 				<div class="flex flex-col justify-end gap-4">
-					{#each messages as message}
-						{#if message.username === data.user.username}
-							<div class="flex items-start justify-end gap-3">
-								<div class="flex-1 space-y-1">
-									<div class="rounded-lg bg-primary p-3 text-primary-foreground">
-										{#if message.repliedToUsername}
-											<div>
-												<p class="text-xs text-muted-foreground">
-													Replied to <u class="text-primary-foreground"
-														>@{message.repliedToUsername}</u
-													>
-													- {message.repliedToMessage}
-												</p>
-											</div>
-										{/if}
-										<p>
-											{message.message}
-										</p>
-									</div>
-									<div class="flex items-center justify-end gap-2 text-xs text-muted-foreground">
-										<span>You</span>
-										<span>{getReadableTime(message.createdAt)}</span>
-										<Button
-											size="icon"
-											variant="ghost"
-											on:click={() => {
-												repliedToUsername = message.username;
-												repliedToMessage = message.message;
-												showReplyAlert = true;
-											}}
+					{#each messages.toReversed() as message}
+						<div
+							class={cn(
+								'flex items-start gap-3',
+								message.username === data.user.username && 'justify-end'
+							)}
+						>
+							<div class="flex-1 space-y-1">
+								<div
+									class={cn(
+										'rounded-lg  p-3 text-primary-foreground',
+										message.username === data.user.username ? 'bg-primary' : 'bg-secondary'
+									)}
+								>
+									{#if message.repliedToUsername}
+										<div>
+											<p class="text-xs text-muted-foreground">
+												Replied to
+												<u
+													class={cn(
+														message.username === data.user.username
+															? 'text-primary-foreground'
+															: 'text-foreground'
+													)}
+													>@{message.repliedToUsername}
+												</u>
+												- {message.repliedToMessage}
+											</p>
+										</div>
+									{/if}
+									<p>
+										{message.message}
+									</p>
+								</div>
+								<div
+									class={cn(
+										'flex items-center gap-2 text-xs text-muted-foreground',
+										message.username === data.user.username && 'justify-end'
+									)}
+								>
+									{#if message.username === data.user.username}
+										<span>You · <Time relative timestamp={message.createdAt} /></span>
+									{:else}
+										<span
+											>@{message.username} · <Time relative timestamp={message.createdAt} /></span
 										>
-											<Reply class="h-5 w-5" />
-										</Button>
-									</div>
+									{/if}
+									<Button
+										size="icon"
+										variant="ghost"
+										on:click={() => {
+											repliedToUsername = message.username;
+											repliedToMessage = message.message;
+											showReplyAlert = true;
+										}}
+									>
+										<Reply class="h-5 w-5" />
+									</Button>
 								</div>
 							</div>
-						{:else}
-							<div class="flex items-start gap-3">
-								<div class="flex-1 space-y-1">
-									<div class="rounded-lg bg-secondary p-3">
-										{#if message.repliedToUsername}
-											<div>
-												<p class="text-xs text-muted-foreground">
-													Replied to <u class="text-foreground">@{message.repliedToUsername}</u>
-													- {message.repliedToMessage}
-												</p>
-											</div>
-										{/if}
-										<p>
-											{message.message}
-										</p>
-									</div>
-									<div class="flex items-center gap-2 text-xs text-muted-foreground">
-										<span>@{message.username}</span>
-										<span>{getReadableTime(message.createdAt)}</span>
-										<Button
-											size="icon"
-											variant="ghost"
-											on:click={() => {
-												repliedToUsername = message.username;
-												repliedToMessage = message.message;
-												showReplyAlert = true;
-											}}
-										>
-											<Reply class="h-5 w-5" />
-										</Button>
-									</div>
-								</div>
-							</div>
-						{/if}
+						</div>
 					{/each}
 				</div>
 			</div>
