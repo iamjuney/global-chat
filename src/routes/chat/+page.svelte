@@ -59,11 +59,14 @@
 					// Add new message to messages array
 					messages = [newMessage, ...messages];
 					message = '';
-					if (data.user.id === payload.new.id) {
+
+					// TODO: Fix this, this is not working
+					if (data.user.username === payload.new.username) {
 						toast.success('Message sent successfully!', {
 							description: getReadableDateNow()
 						});
 					}
+
 					if (chatWindow) {
 						chatWindow.scrollTop = chatWindow.scrollHeight;
 					}
