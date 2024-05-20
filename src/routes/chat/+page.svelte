@@ -3,14 +3,18 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import * as Alert from '$lib/components/ui/alert';
 	import { getReadableDateNow } from '$lib/utils';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { BadgeAlert, LogOut, Reply, Send, Loader2 } from 'lucide-svelte';
+	import { BadgeAlert, LogOut, Reply, Send, Loader2, X } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
 	let isSending = $state(false);
 	let message = $state('');
+	let repliedToUsername = $state('');
+	let repliedToMessage = $state('');
+	let showReplyAlert = $state(false);
 
 	$effect(() => {
 		if (data.user) {
@@ -78,7 +82,7 @@
 					class="h-[1px] w-full shrink-0 bg-gray-100"
 				></div>
 			</div>
-			<div class="flex-1 overflow-y-auto pr-3">
+			<div class="-mr-2 flex-1 overflow-y-auto pr-2">
 				<div class="flex flex-col justify-end gap-4">
 					<div class="flex items-start gap-3">
 						<div class="flex-1 space-y-1">
@@ -91,7 +95,16 @@
 							<div class="flex items-center gap-2 text-xs text-gray-500">
 								<span>@shadcn</span>
 								<span>9:15 AM</span>
-								<Button size="icon" variant="ghost">
+								<Button
+									size="icon"
+									variant="ghost"
+									on:click={() => {
+										repliedToUsername = 'shadcn';
+										repliedToMessage =
+											"Hey everyone! Just wanted to say hi and let you know I'm excited to be part of this global chat app.";
+										showReplyAlert = true;
+									}}
+								>
 									<Reply class="h-5 w-5" />
 								</Button>
 							</div>
@@ -158,6 +171,26 @@
 					</div>
 				</div>
 			</div>
+
+			{#if showReplyAlert}
+				<div class="flex items-center gap-2">
+					<Alert.Root class="flex-1">
+						<Reply class="size-5" />
+						<Alert.Title>Reply to <u class="text-foreground">@{repliedToUsername}</u></Alert.Title>
+						<Alert.Description>{repliedToMessage}</Alert.Description>
+					</Alert.Root>
+					<Button
+						size="icon"
+						variant="ghost"
+						on:click={() => {
+							showReplyAlert = false;
+						}}
+					>
+						<X class="size-6" />
+					</Button>
+				</div>
+			{/if}
+
 			<form
 				method="POST"
 				action="?/send"
@@ -165,6 +198,10 @@
 				use:enhance={handleSubmit}
 			>
 				<Input name="message" bind:value={message} placeholder="Type a message..." class="flex-1" />
+				{#if showReplyAlert}
+					<input type="hidden" name="replied_to_username" value={repliedToUsername} />
+					<input type="hidden" name="replied_to_message" value={repliedToMessage} />
+				{/if}
 				<Button type="submit" size="icon" variant="ghost" disabled={isSending}>
 					{#if isSending}
 						<span class="animate-spin">

@@ -23,8 +23,8 @@ export const TB_chats = pgTable('chats', {
 	})
 		.notNull()
 		.references(() => TB_users.id),
-	repliedToUsername: varchar('replied_to_username').default('').notNull(),
-	repliedToMessage: text('replied_to_message').default('').notNull(),
+	repliedToUsername: varchar('replied_to_username').default(''),
+	repliedToMessage: text('replied_to_message').default(''),
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
