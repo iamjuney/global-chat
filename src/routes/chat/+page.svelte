@@ -1,16 +1,26 @@
 <script lang="ts">
+	// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 	import { enhance } from '$app/forms';
 	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import { supabase } from '$lib/supabase/client';
 	import { getReadableDateNow, getReadableTime } from '$lib/utils';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { BadgeAlert, Loader2, LogOut, Reply, Send, X } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
+	type Message = {
+		username: string;
+		message: string;
+		repliedToUsername: string;
+		repliedToMessage: string;
+		createdAt: Date;
+	};
+
 	let { data } = $props();
-	let messages = $derived(data.messages);
+	let messages = $state<Message[]>(data.messages);
 	let isSending = $state(false);
 	let message = $state('');
 	let repliedToUsername = $state('');
@@ -23,6 +33,35 @@
 				description: getReadableDateNow()
 			});
 		}
+	});
+
+	$effect(() => {
+		const channel = supabase
+			.channel('realtime chats')
+			.on(
+				'postgres_changes',
+				{
+					event: 'INSERT',
+					schema: 'public',
+					table: 'chats'
+				},
+				(payload) => {
+					const newMessage = {
+						username: payload.new.username,
+						message: payload.new.message,
+						repliedToUsername: payload.new.replied_to_username,
+						repliedToMessage: payload.new.replied_to_message,
+						createdAt: payload.new.created_at
+					};
+
+					messages.push(newMessage);
+				}
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(channel);
+		};
 	});
 
 	const handleSubmit: SubmitFunction = () => {
@@ -183,12 +222,7 @@
 				</div>
 			{/if}
 
-			<form
-				method="POST"
-				action="?/send"
-				class="flex items-center gap-2"
-				use:enhance={handleSubmit}
-			>
+			<form method="POST" class="flex items-center gap-2" use:enhance={handleSubmit}>
 				<Input name="message" bind:value={message} placeholder="Type a message..." class="flex-1" />
 				{#if showReplyAlert}
 					<input type="hidden" name="replied_to_username" value={repliedToUsername} />

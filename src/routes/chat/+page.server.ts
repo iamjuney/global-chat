@@ -24,7 +24,7 @@ export const load: PageServerLoad = async (event) => {
 	};
 };
 
-// min of two words, max of 1000 characters
+// Define the schema for the message form
 const messageSchema = z.object({
 	message: z.string().min(2).max(1000),
 	replied_to_username: z.string().optional(),
@@ -32,7 +32,7 @@ const messageSchema = z.object({
 });
 
 export const actions: Actions = {
-	send: async ({ request, fetch, locals }) => {
+	default: async ({ request, fetch, locals }) => {
 		// Check if the user is authorized
 		if (!locals.user) {
 			return fail(401, { message: 'Unauthorized' });

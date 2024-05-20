@@ -38,6 +38,7 @@
   "type": "module",
   "dependencies": {
     "@lucia-auth/adapter-drizzle": "^1.0.7",
+    "@supabase/supabase-js": "^2.43.2",
     "@types/node": "^20.12.12",
     "@types/nprogress": "^0.2.3",
     "@types/pg": "^8.11.6",
