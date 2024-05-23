@@ -9,6 +9,19 @@
 	import { toast } from 'svelte-sonner';
 	import Time from 'svelte-time';
 
+	// This is a test function
+	function hello() {
+		console.log('hello');
+	}
+
+	// sample class
+	class Sample {
+		constructor() {
+			console.log('Sample class');
+		}
+	}
+
+	// Message type
 	type Message = {
 		username: string;
 		message: string;
@@ -143,6 +156,7 @@
 	};
 </script>
 
+<!-- Message Bubble Snippet -->
 {#snippet messageBubble(message: Message)}
 	<div
 		class={cn('flex items-start gap-3', message.username === data.user.username && 'justify-end')}
@@ -224,6 +238,7 @@
 		class="h-full w-full max-w-[576px] rounded-lg border bg-background p-4 shadow-md md:h-[70vh]"
 	>
 		<div class="flex h-full flex-col justify-end gap-4">
+			<!-- Header -->
 			<div class="flex flex-col gap-2">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-3">
@@ -259,6 +274,7 @@
 				></div>
 			</div>
 
+			<!-- Chat Window -->
 			<div
 				bind:this={chatWindow}
 				onscroll={loadMoreMessages}
@@ -284,6 +300,7 @@
 			</div>
 
 			{#if showReplyAlert}
+				<!-- Reply Input -->
 				<div class="flex items-center gap-2">
 					<Alert.Root class="flex-1">
 						<Reply class="size-5" />
@@ -302,6 +319,7 @@
 				</div>
 			{/if}
 
+			<!-- Message Input -->
 			<form method="POST" class="flex items-center gap-2" use:enhance={handleSubmit}>
 				<Input name="message" bind:value={message} placeholder="Type a message..." class="flex-1" />
 				{#if showReplyAlert}
