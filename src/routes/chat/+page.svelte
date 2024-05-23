@@ -9,18 +9,6 @@
 	import { toast } from 'svelte-sonner';
 	import Time from 'svelte-time';
 
-	// This is a test function
-	function hello() {
-		console.log('hello');
-	}
-
-	// sample class
-	class Sample {
-		constructor() {
-			console.log('Sample class');
-		}
-	}
-
 	// Message type
 	type Message = {
 		username: string;
